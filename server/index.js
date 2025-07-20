@@ -28,9 +28,10 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    //1. from mongodb, "name_of_the_database"
+    //1.for storing data/creating api(just variable declaration), from mongodb, "name_of_the_database"
     const menuCollection = client.db("bistroDB").collection("menu");
     const reviewCollection = client.db("bistroDB").collection("reviews");
+    const cartCollection = client.db("bistroDB").collection("carts");
 
     //step-2
     app.get('/menu', async(req, res) => {
@@ -40,6 +41,13 @@ async function run() {
     app.get('/reviews', async(req, res) => {
         const result = await reviewCollection.find().toArray();
         res.send(result);
+    })
+
+    // carts collection, insert/add data from clicking on "Add Card" btn
+    app.post('/carts', async(req, res) => {
+      const cartItem = req.body;
+      const result = await cartCollection.insertOne(cartItem);
+      res.send(result);
     })
 
 
@@ -64,3 +72,18 @@ app.get('/', (req, res) => {
 app.listen(port, ()=> {
     console.log(`bistro boss is sitting on port ${port}`);
 })
+
+
+
+
+/*
+  ------------------------
+      NAMING CONVENTION
+  ------------------------
+  app.get(/users) : get information of all users
+  app.get(/users/:id) : get information of specific user
+  app.post(/users) : create a user
+  app.put(/users/:id) : Used to replace the entire user resource with a new one.
+  app.patch(/user/:id) : Used to partially update a user resource.
+  app.delete(/users/:id) :  Deletes the user with the specified ID.
+*/
