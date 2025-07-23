@@ -43,12 +43,22 @@ async function run() {
         res.send(result);
     })
 
-    // carts collection, insert/add data from clicking on "Add Card" btn
+    // carts collection,
+    // insert/add data from clicking on "Add Card" btn
     app.post('/carts', async(req, res) => {
       const cartItem = req.body;
       const result = await cartCollection.insertOne(cartItem);
       res.send(result);
     })
+
+    // It reads (fetches) all the cart items from your MongoDB carts collection and sends them back as an array in the response.
+    app.get('/carts', async(req, res) => {
+      const result = await cartCollection.find().toArray();
+      res.send(result);
+    });
+
+
+    
 
 
     // Send a ping to confirm a successful connection
