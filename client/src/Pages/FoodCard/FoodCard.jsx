@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
 // import useCart from "../../hooks/useCart";
 import useAuth from './../../Hooks/useAuth';
+import useCart from "../../Hooks/useCart";
 
 const FoodCard = ({item}) => {
     const { name, image, price, recipe, _id } = item;
@@ -10,7 +11,7 @@ const FoodCard = ({item}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const axiosSecure = useAxiosSecure();
-    // const [, refetch] = useCart();
+    const [, refetch] = useCart();
 
     const handleAddToCart = () => {
         // if (user logged in ) ? "do" : else "alert(swal) and sent the user to login page (using navigate)";
