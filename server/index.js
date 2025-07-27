@@ -29,9 +29,10 @@ async function run() {
     await client.connect();
 
     //1.for storing data/creating api(just variable declaration), from mongodb, "name_of_the_database"
-    const menuCollection = client.db("bistroDB").collection("menu");
-    const reviewCollection = client.db("bistroDB").collection("reviews");
-    const cartCollection = client.db("bistroDB").collection("carts");
+    const menuCollection = client.db("bistroDB").collection("menu");// '/menu'
+    const userCollection = client.db("bistroDB").collection("users ");// '/user'
+    const reviewCollection = client.db("bistroDB").collection("reviews");// '/reviews'
+    const cartCollection = client.db("bistroDB").collection("carts"); // '/carts'
 
     //step-2
     app.get('/menu', async(req, res) => {
@@ -42,6 +43,28 @@ async function run() {
         const result = await reviewCollection.find().toArray();
         res.send(result);
     })
+
+
+    // user related api, (first do the cart operation)
+    app.post('/users', async(req, res) => {
+      const user = req.body;
+      // insert email if user doesn't exist;
+      const query = { email: user.email }
+      const existingUser = await userCollection.findOne(query);
+      if(existingUser){
+        return res.send({ message: 'user already exist', insertedId: null })
+      }
+      const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
+
+    // read the users information
+  // used in AllUsers
+    app.get('/users', async(req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    })
+
 
     // carts collection,
     // insert/add data from clicking on "Add Card" btn
