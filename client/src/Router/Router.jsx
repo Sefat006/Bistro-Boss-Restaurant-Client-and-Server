@@ -1,5 +1,5 @@
 import React from 'react';
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, useParams } from 'react-router';
 import Main from '../Layout/Main';
 import Home from '../Pages/Home';
 import Menu from '../Pages/Menu';
@@ -11,6 +11,10 @@ import Secret from '../Pages/Login & Register/Secret';
 import Dashboard from '../Layout/Dashboard';
 import Cart from '../Pages/Dashboard/Cart';
 import AllUsers from '../Pages/Dashboard/AllUsers';
+import AddItems from '../Pages/Dashboard/AddItems';
+import AdminRoute from './AdminRoute';
+import ManageItems from '../Pages/Dashboard/ManageItems';
+import UpdateItem from '../Pages/Dashboard/UpdateItem';
 
 const Router = createBrowserRouter([
     {
@@ -49,14 +53,29 @@ const Router = createBrowserRouter([
         path: 'dashboard',
         element: <PrivateRoute><Dashboard></Dashboard></PrivateRoute>,
         children: [
+            // normal user route
             {
                 path: 'cart',
                 element: <Cart></Cart>
             },
             // admin routes
             {
+                path: 'addItems',
+                element: <AdminRoute><AddItems></AddItems></AdminRoute>
+            },
+            {
+                path: 'manageItems',
+                element: <AdminRoute><ManageItems></ManageItems></AdminRoute>
+            },
+            {
+                path: 'updateItem/:id',
+                element: <AdminRoute><UpdateItem></UpdateItem></AdminRoute>,
+                loader: ({params}) => fetch(`http://localhost:5000/menu/${useParams.id}`)
+
+            },
+            {
                 path: 'users',
-                element: <AllUsers></AllUsers>
+                element: <AdminRoute><AllUsers></AllUsers></AdminRoute>
             },
         ]
     }
