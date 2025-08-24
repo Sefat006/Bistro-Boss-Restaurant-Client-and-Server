@@ -12,4 +12,6 @@
 - **Sweet-alert** - Used for notifying login successful login and sign up.
 - Axios
 - Firebase (if you used it)
-- ...
+- **Stripe** - For payment method
+- **react-stripe-js** - Github
+- ****

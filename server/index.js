@@ -2,14 +2,13 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
-require('dotenv').config()
+require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const port = process.env.PORT || 5000;
 
 //middleware
 app.use(cors());
 app.use(express.json());
-
-
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
@@ -34,6 +33,7 @@ async function run() {
     const userCollection = client.db("bistroDB").collection("users");// '/user'
     const reviewCollection = client.db("bistroDB").collection("reviews");// '/reviews'
     const cartCollection = client.db("bistroDB").collection("carts"); // '/carts'
+    const paymentCollection = client.db('bistroDB').collection('payments');
 
     // jwt related api
     app.post('/jwt', async(req, res) => {
@@ -204,6 +204,45 @@ async function run() {
     })
     
 
+    //stripe // dashboard/checkoutFrom.jsx
+    app.post("/create-payment-intent", async(req, res)=>{
+      const {price} = req.body;
+      const amount = parseInt(price*100);
+
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'usd',
+        payment_method_types: ['card']
+      });
+
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      })
+    })
+
+    // payment information save on database
+    app.post('/payments', async(req, res) => {
+      const payment = req.body;
+      const paymentResult = await paymentCollection.insertOne(payment);
+
+      //delete each item from the cart
+      console.log('payment info', payment);
+      const query = {
+        _id: { $in: payment.cartIds.map(id => new ObjectId(id)) }
+      };
+
+      const deleteResult = await cartCollection.deleteMany(query);
+      res.send({paymentResult, deleteResult});
+    })
+
+    app.get('/payments/:email',verifyToken, async(req, res)=> {
+      const query = { email: req.params.email }
+      if(req.params.email !== req.decoded.email){
+        return res.status(403).send({message: 'forbidden access'});
+      }
+      const result = await paymentCollection.find(query).toArray();
+      res.send(result);
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });

@@ -12,7 +12,7 @@ const AuthProvider = ( {children} ) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const googleProvider = new GoogleAuthProvider();
-    const axiosPublic = useAxiosPublic();
+    const axiosPublic = useAxiosPublic();//useEffect diye link call korsi
 
 
     const createUser = (email, password) => {
